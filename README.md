@@ -23,41 +23,41 @@
 ```mermaid
 flowchart TD
     subgraph Ingestion ["1. Real-Time Transaction Ingestion"]
-        POS[Card POS Terminal] --> API[FastAPI Gateway]
-        Online[E-Commerce CNP] --> API
-        Sim[Stream Simulator] --> API
+        POS["Card POS Terminal"] --> API["FastAPI Gateway"]
+        Online["E-Commerce CNP"] --> API
+        Sim["Stream Simulator"] --> API
     end
 
     subgraph FeaturePipeline ["2. Domain Feature Engineering"]
-        API --> FE[Geo-Velocity Engine]
-        FE --> Speed[km/h Travel Speed Calculation]
-        FE --> Vel[1h / 24h Velocity Surge]
-        FE --> Outlier[Spend vs Cardholder 30d Baseline]
-        FE --> DevTrust[Device Fingerprint Suspicion]
+        API --> FE["Geo-Velocity Engine"]
+        FE --> Speed["km/h Travel Speed Calculation"]
+        FE --> Vel["1h / 24h Velocity Surge"]
+        FE --> Outlier["Spend vs Cardholder 30d Baseline"]
+        FE --> DevTrust["Device Fingerprint Suspicion"]
     end
 
     subgraph MLSuite ["3. Machine Learning Ensemble"]
-        FE --> XGB[XGBoost Classifier (Cost-Weighted)]
-        FE --> RF[Balanced Random Forest]
-        FE --> HGB[HistGradientBoosting]
-        FE --> IF[Isolation Forest (Zero-Day Anomaly)]
-        XGB --> Ensemble[Blended Decision Engine]
+        FE --> XGB["XGBoost Classifier (Cost-Weighted)"]
+        FE --> RF["Balanced Random Forest"]
+        FE --> HGB["HistGradientBoosting"]
+        FE --> IF["Isolation Forest (Zero-Day Anomaly)"]
+        XGB --> Ensemble["Blended Decision Engine"]
         RF --> Ensemble
         IF --> Ensemble
     end
 
     subgraph DecisionXAI ["4. Risk Scoring & XAI Diagnostics"]
-        Ensemble --> Tier[Risk Tiering: Low / Med / High]
-        Ensemble --> XAI[Explainable AI Diagnostics]
+        Ensemble --> Tier["Risk Tiering: Low / Med / High"]
+        Ensemble --> XAI["Explainable AI Diagnostics"]
     end
 
     subgraph Operations ["5. Enterprise Operations Center"]
-        Tier --> Action{Operational Action}
-        Action -->|Score < 25%| Approve[Instant Approval]
-        Action -->|Score 25-65%| StepUp[3D Secure / OTP Challenge]
-        Action -->|Score > 65%| Decline[Decline & Card Freeze]
-        XAI --> Dashboard[Live Cyber Defense Command UI]
-        XAI --> Queue[Analyst Triage Queue]
+        Tier --> Action{"Operational Action"}
+        Action -->|"Score under 25%"| Approve["Instant Approval"]
+        Action -->|"Score 25% to 65%"| StepUp["3D Secure / OTP Challenge"]
+        Action -->|"Score over 65%"| Decline["Decline & Card Freeze"]
+        XAI --> Dashboard["Live Cyber Defense Command UI"]
+        XAI --> Queue["Analyst Triage Queue"]
     end
 ```
 
