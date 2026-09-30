@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FraudGuard.AI — Real-Time Credit Card Fraud Prevention Platform</title>
+  <meta name="description" content="Next-generation machine learning platform for real-time credit card fraud detection, transaction risk scoring, and explainable AI diagnostics.">
+  
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+
+  <!-- Application CSS -->
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <div class="app-container">
+    
+    <!-- Top Navigation Header -->
+    <header class="app-header">
+      <div class="brand-wrapper">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 2.18l7 3.12v4.7c0 4.54-3.13 8.78-7 9.88-3.87-1.1-7-5.34-7-9.88V6.3l7-3.12zM11 7v2h2V7h-2zm0 4v6h2v-6h-2z"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>FRAUDGUARD.AI</h1>
+          <div class="sub-badge">FINANCIAL DEFENSE ENGINE // v1.0</div>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <div class="status-indicator">
+          <div class="status-dot"></div>
+          <span id="systemStatusText">REAL-TIME INFERENCE: ONLINE</span>
+        </div>
+
+        <div class="model-selector-box">
+          <label for="modelSelect">Active ML Engine:</label>
+          <select id="modelSelect" class="model-select">
+            <option value="xgboost" selected>XGBoost (Cost-Sensitive)</option>
+            <option value="random_forest">Balanced Random Forest</option>
+            <option value="hist_gradient_boost">HistGradientBoosting</option>
+            <option value="ensemble">Ensemble Blend (XGB+RF+IF)</option>
+            <option value="isolation_forest">Isolation Forest (Anomaly)</option>
+            <option value="logistic_regression">Logistic Regression (Baseline)</option>
+          </select>
+        </div>
+
+        <button id="btnAttackBurst" class="btn btn-danger btn-sm">
+          <span>⚡</span> Simulate Attack Burst
+        </button>
+      </div>
+    </header>
+
+    <!-- Navigation Tabs Bar -->
+    <nav class="nav-tabs-bar">
+      <button class="nav-tab-btn active" data-tab="tab-operations">
+        <span>📊</span> Operations Command Center
+      </button>
+      <button class="nav-tab-btn" data-tab="tab-simulator">
+        <span>🧪</span> Transaction Simulator & XAI
+      </button>
+      <button class="nav-tab-btn" data-tab="tab-models">
+        <span>🔬</span> Model Performance Lab
+      </button>
+      <button class="nav-tab-btn" data-tab="tab-analyst">
+        <span>🛡️</span> Analyst Review Queue
+      </button>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="main-wrapper">
+      
+      <!-- KPI Executive Metrics Strip -->
+      <section class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-title">Transactions Processed</span>
+            <div class="kpi-icon" style="background: rgba(56, 189, 248, 0.15); color: #38BDF8;">💳</div>
+          </div>
+          <div class="kpi-value" id="kpiTotalProcessed">0</div>
+          <div class="kpi-subtext">Live stream throughput</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-title">Frauds Intercepted</span>
+            <div class="kpi-icon" style="background: rgba(244, 63, 94, 0.15); color: #F43F5E;">🚨</div>
+          </div>
+          <div class="kpi-value" id="kpiFraudCount" style="color: var(--rose);">0</div>
+          <div class="kpi-subtext"><span id="kpiFraudRate">0.0%</span> of total volume</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-title">Capital Loss Prevented</span>
+            <div class="kpi-icon" style="background: rgba(16, 185, 129, 0.15); color: #10B981;">💰</div>
+          </div>
+          <div class="kpi-value" id="kpiSavingsUsd" style="color: var(--emerald);">$0</div>
+          <div class="kpi-subtext">Estimated chargebacks avoided</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-title">Avg Scoring Latency</span>
+            <div class="kpi-icon" style="background: rgba(139, 92, 246, 0.15); color: #8B5CF6;">⚡</div>
+          </div>
+          <div class="kpi-value" id="kpiLatency">0.0 ms</div>
+          <div class="kpi-subtext">Sub-10ms real-time target</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-title">Fraud Recall Rate</span>
+            <div class="kpi-icon" style="background: rgba(245, 158, 11, 0.15); color: #F59E0B;">🎯</div>
+          </div>
+          <div class="kpi-value" id="kpiRecall">100.0%</div>
+          <div class="kpi-subtext">Zero undetected attacks</div>
+        </div>
+      </section>
+
+      <!-- TAB 1: OPERATIONS COMMAND CENTER -->
+      <section id="tab-operations" class="tab-content active">
+        <div class="dashboard-grid">
+          
+          <!-- Live Stream Column -->
+          <div class="panel-card">
+            <div class="panel-header">
+              <div class="panel-title">
+                <span>⚡</span> Live Transaction Authorization Feed
+              </div>
+              <div class="panel-actions">
+                <button id="btnToggleStream" class="btn btn-secondary btn-sm">
+                  <span id="streamToggleIcon">⏸️</span> <span id="streamToggleText">Pause Stream</span>
+                </button>
+                <button id="btnEmitSingle" class="btn btn-primary btn-sm">
+                  <span>➕</span> Emit 1 Txn
+                </button>
+              </div>
+            </div>
+
+            <div class="live-stream-feed" id="liveFeedContainer">
+              <!-- Stream Cards injected dynamically via JS -->
+            </div>
+          </div>
+
+          <!-- Side Analytics Radar -->
+          <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+            
+            <!-- Risk Gauge & Tiers -->
+            <div class="panel-card">
+              <div class="panel-header">
+                <div class="panel-title"><span>🛡️</span> Risk Tier Distribution</div>
+              </div>
+              <div style="height: 220px; position: relative;">
+                <canvas id="riskDoughnutChart"></canvas>
+              </div>
+              <div style="display: flex; justify-content: space-around; margin-top: 1rem; font-size: 0.8rem; font-family: var(--font-mono);">
+                <span style="color: var(--emerald);">● Low (<25%)</span>
+                <span style="color: var(--amber);">● Med (25-65%)</span>
+                <span style="color: var(--rose);">● High (>65%)</span>
+              </div>
+            </div>
+
+            <!-- Category Risk Heatmap -->
+            <div class="panel-card">
+              <div class="panel-header">
+                <div class="panel-title"><span>📊</span> Merchant Category Volume</div>
+              </div>
+              <div style="height: 220px; position: relative;">
+                <canvas id="categoryBarChart"></canvas>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      <!-- TAB 2: TRANSACTION SIMULATOR & MANUAL TESTER -->
+      <section id="tab-simulator" class="tab-content">
+        <div class="simulator-layout">
+          
+          <!-- Input Form & Attack Presets -->
+          <div class="panel-card">
+            <div class="panel-header">
+              <div class="panel-title"><span>🧪</span> Interactive Transaction Inspector</div>
+            </div>
+
+            <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 1rem;">
+              Click an attack vector preset or manually customize parameters to score a transaction through the live machine learning pipeline:
+            </p>
+
+            <!-- Presets -->
+            <div class="preset-strip">
+              <button class="preset-chip" data-preset="cloning">🔴 Attack: Card Cloning / Teleportation</button>
+              <button class="preset-chip" data-preset="testing">🔴 Attack: Bot Card Testing Storm</button>
+              <button class="preset-chip" data-preset="crypto">🔴 Attack: Midnight Crypto Drain</button>
+              <button class="preset-chip" data-preset="pin_brute">🔴 Attack: PIN Brute-Force POS</button>
+              <button class="preset-chip" data-preset="coffee">🟢 Normal: Morning Coffee POS</button>
+              <button class="preset-chip" data-preset="grocery">🟢 Normal: Weekly Grocery Run</button>
+            </div>
+
+            <!-- Transaction Form -->
+            <form id="simulatorForm" class="form-grid">
+              <div class="form-group">
+                <label for="formAmount">Amount ($ USD)</label>
+                <input type="number" step="0.01" id="formAmount" class="form-control" value="185.00" required>
+              </div>
+
+              <div class="form-group">
+                <label for="formCategory">Merchant Category</label>
+                <select id="formCategory" class="form-control">
+                  <option value="grocery">Grocery & Supermarket</option>
+                  <option value="online_retail">Online Retail E-Commerce</option>
+                  <option value="electronics">Electronics & Tech</option>
+                  <option value="crypto_forex">Cryptocurrency & Forex</option>
+                  <option value="wire_transfer">Wire / Remittance Transfer</option>
+                  <option value="travel_airline">Airlines & Travel</option>
+                  <option value="restaurant_dining">Restaurant & Dining</option>
+                  <option value="entertainment">Entertainment & Gaming</option>
+                  <option value="gas_transport">Gas & Transit</option>
+                  <option value="luxury_goods">Luxury Jewelry & Watches</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="formDistLast">Distance From Last Txn (km)</label>
+                <input type="number" step="0.1" id="formDistLast" class="form-control" value="4.5">
+              </div>
+
+              <div class="form-group">
+                <label for="formTimeLast">Minutes Since Last Txn</label>
+                <input type="number" step="0.1" id="formTimeLast" class="form-control" value="180.0">
+              </div>
+
+              <div class="form-group">
+                <label for="formVel1h">Velocity (Past 1 Hour)</label>
+                <input type="number" id="formVel1h" class="form-control" value="1">
+              </div>
+
+              <div class="form-group">
+                <label for="formVel24h">Velocity (Past 24 Hours)</label>
+                <input type="number" id="formVel24h" class="form-control" value="3">
+              </div>
+
+              <div class="form-group">
+                <label for="formRatio">Amount to User Baseline Ratio</label>
+                <input type="number" step="0.1" id="formRatio" class="form-control" value="1.1">
+              </div>
+
+              <div class="form-group">
+                <label for="formDeviceTrust">Device Trust Score (0-100)</label>
+                <input type="number" step="1" min="0" max="100" id="formDeviceTrust" class="form-control" value="90">
+              </div>
+
+              <div class="form-group">
+                <label for="formForeign">Foreign Terminal Transaction</label>
+                <select id="formForeign" class="form-control">
+                  <option value="0">No (Domestic)</option>
+                  <option value="1">Yes (Cross-Border)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="formFailedPin">Failed PIN Attempts (24h)</label>
+                <input type="number" id="formFailedPin" class="form-control" value="0" min="0" max="5">
+              </div>
+
+              <div class="form-group full-width" style="margin-top: 0.5rem;">
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                  <span>⚡</span> Evaluate Fraud Probability & Explainability
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Assessment Output -->
+          <div class="panel-card assessment-result-box" id="assessmentResultCard">
+            <div class="panel-header" style="border: none; padding-bottom: 0; margin-bottom: 0;">
+              <div class="panel-title"><span>🔍</span> Real-Time Risk Assessment & Explainability</div>
+              <span id="resultLatencyBadge" style="font-size: 0.75rem; font-family: var(--font-mono); color: var(--cyan);">Latency: -- ms</span>
+            </div>
+
+            <div class="gauge-wrapper">
+              <div>
+                <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Fraud Risk Score</div>
+                <div class="gauge-score low" id="resultScore">0.0%</div>
+              </div>
+              <div style="text-align: right;">
+                <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">ML Model Confidence</div>
+                <div style="font-size: 1.35rem; font-weight: 700; font-family: var(--font-mono); color: #FFFFFF;" id="resultProb">0.0000</div>
+              </div>
+            </div>
+
+            <!-- Action Banner -->
+            <div class="risk-action-banner auto-approve" id="resultActionBanner">
+              <div class="action-title" id="resultActionTitle">AUTO_APPROVE</div>
+              <div class="action-desc" id="resultActionDesc">Transaction authorized instantly. Zero customer friction.</div>
+            </div>
+
+            <!-- XAI Factors Breakdown -->
+            <div>
+              <div style="font-size: 0.85rem; font-weight: 700; color: #FFFFFF; margin-bottom: 0.6rem; display: flex; justify-content: space-between;">
+                <span>Explainable AI Risk Factors (XAI)</span>
+                <span style="font-size: 0.72rem; color: var(--text-muted);">Root Cause Diagnostics</span>
+              </div>
+              <div class="factors-list" id="resultFactorsList">
+                <div class="factor-item">
+                  <div class="factor-header">
+                    <span class="factor-name">Normal Cardholder Telemetry</span>
+                    <span class="severity-pill sev-low">LOW RISK</span>
+                  </div>
+                  <div class="factor-detail">Transaction patterns align with verified cardholder baseline behavior.</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      <!-- TAB 3: MODEL PERFORMANCE LAB -->
+      <section id="tab-models" class="tab-content">
+        <div class="panel-card" style="margin-bottom: 1.5rem;">
+          <div class="panel-header">
+            <div class="panel-title"><span>🔬</span> Multi-Model Evaluation & Leaderboard Benchmark</div>
+            <button id="btnRetrain" class="btn btn-secondary btn-sm">
+              <span>🔄</span> Trigger Retraining Pipeline
+            </button>
+          </div>
+
+          <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 1rem;">
+            Comparative benchmarking of supervised algorithms, gradient boosting, and unsupervised anomaly detection evaluated on 5,000 holdout transactions (1.2% fraud prevalence). Note the vital importance of <strong>PR-AUC</strong> and <strong>Recall</strong> in extreme class imbalance.
+          </p>
+
+          <div class="table-responsive">
+            <table class="modern-table" id="modelsTable">
+              <thead>
+                <tr>
+                  <th>Model Algorithm</th>
+                  <th>Recall (Detection)</th>
+                  <th>Precision</th>
+                  <th>F1-Score</th>
+                  <th>F2-Score</th>
+                  <th>PR-AUC</th>
+                  <th>ROC-AUC</th>
+                  <th>Latency</th>
+                  <th>Net Fraud Saved ($)</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="modelsTableBody">
+                <!-- Injected via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Evaluation Curves -->
+        <div class="charts-grid">
+          <div class="chart-box">
+            <div style="font-size: 0.9rem; font-weight: 700; margin-bottom: 0.5rem;">Precision-Recall (PR) Curve (Imbalanced Benchmark)</div>
+            <div style="height: calc(100% - 30px); position: relative;">
+              <canvas id="prCurveChart"></canvas>
+            </div>
+          </div>
+
+          <div class="chart-box">
+            <div style="font-size: 0.9rem; font-weight: 700; margin-bottom: 0.5rem;">Receiver Operating Characteristic (ROC) Curve</div>
+            <div style="height: calc(100% - 30px); position: relative;">
+              <canvas id="rocCurveChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Financial ROI Calculator -->
+        <div class="panel-card" style="margin-top: 1.5rem;">
+          <div class="panel-header">
+            <div class="panel-title"><span>💰</span> Enterprise Financial ROI & Fraud Loss Calculator</div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem;">
+            <div>
+              <label style="font-size: 0.78rem; color: var(--text-secondary); font-weight: 600;">Monthly Transaction Volume</label>
+              <input type="number" id="calcVolume" class="form-control" value="250000" style="margin-top: 0.35rem;">
+            </div>
+            <div>
+              <label style="font-size: 0.78rem; color: var(--text-secondary); font-weight: 600;">Estimated Fraud Rate (%)</label>
+              <input type="number" step="0.1" id="calcRate" class="form-control" value="0.8" style="margin-top: 0.35rem;">
+            </div>
+            <div>
+              <label style="font-size: 0.78rem; color: var(--text-secondary); font-weight: 600;">Average Fraud Ticket ($ USD)</label>
+              <input type="number" id="calcTicket" class="form-control" value="385" style="margin-top: 0.35rem;">
+            </div>
+          </div>
+
+          <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: var(--radius-sm); padding: 1.25rem; margin-top: 1.25rem; display: flex; justify-content: space-around; align-items: center; text-align: center;">
+            <div>
+              <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Unprotected Fraud Loss / Yr</div>
+              <div style="font-size: 1.5rem; font-weight: 800; color: var(--rose); font-family: var(--font-mono);" id="calcLossNoML">$9,240,000</div>
+            </div>
+            <div style="font-size: 1.5rem; color: var(--text-muted);">➔</div>
+            <div>
+              <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Fraud Losses Saved by ML / Yr</div>
+              <div style="font-size: 1.75rem; font-weight: 900; color: var(--emerald); font-family: var(--font-mono);" id="calcNetSavings">$9,180,000</div>
+            </div>
+            <div style="font-size: 1.5rem; color: var(--text-muted);">➔</div>
+            <div>
+              <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Annual Net ROI Reduction</div>
+              <div style="font-size: 1.5rem; font-weight: 800; color: var(--cyan); font-family: var(--font-mono);" id="calcRoiPercent">99.3%</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 4: ANALYST REVIEW QUEUE -->
+      <section id="tab-analyst" class="tab-content">
+        <div class="panel-card">
+          <div class="panel-header">
+            <div class="panel-title"><span>🛡️</span> Fraud Operations Center // Investigation Queue</div>
+            <span style="font-size: 0.8rem; color: var(--text-secondary);">Filtered to High & Medium Risk Transactions</span>
+          </div>
+
+          <div class="table-responsive">
+            <table class="modern-table">
+              <thead>
+                <tr>
+                  <th>Txn ID</th>
+                  <th>Timestamp</th>
+                  <th>User ID</th>
+                  <th>Amount</th>
+                  <th>Category</th>
+                  <th>Risk Tier</th>
+                  <th>Score</th>
+                  <th>Primary Threat Driver</th>
+                  <th>Triage Action</th>
+                </tr>
+              </thead>
+              <tbody id="analystTableBody">
+                <!-- Injected via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Deep Dive Investigation Modal -->
+    <div class="modal-overlay" id="investigationModal">
+      <div class="modal-content">
+        <button class="modal-close-btn" id="modalCloseBtn">&times;</button>
+        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem;">
+          <div class="card-badge badge-high" id="modalBadge">HIGH RISK</div>
+          <h2 style="font-size: 1.25rem; font-weight: 800;" id="modalTxnTitle">Transaction Investigation: TXN-0000</h2>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem; font-size: 0.82rem;">
+          <div><span style="color: var(--text-muted);">Cardholder ID:</span> <strong id="modalUserId" style="font-family: var(--font-mono);">--</strong></div>
+          <div><span style="color: var(--text-muted);">Timestamp:</span> <span id="modalTimestamp" style="font-family: var(--font-mono);">--</span></div>
+          <div><span style="color: var(--text-muted);">Amount:</span> <strong id="modalAmount" style="color: #FFFFFF; font-family: var(--font-mono); font-size: 1rem;">--</strong></div>
+          <div><span style="color: var(--text-muted);">Merchant Category:</span> <span id="modalCategory" style="text-transform: capitalize;">--</span></div>
+          <div><span style="color: var(--text-muted);">Geo Distance / Speed:</span> <span id="modalGeo" style="font-family: var(--font-mono);">--</span></div>
+          <div><span style="color: var(--text-muted);">1h / 24h Velocity:</span> <span id="modalVelocity" style="font-family: var(--font-mono);">--</span></div>
+          <div><span style="color: var(--text-muted);">Device Trust Score:</span> <span id="modalDeviceTrust" style="font-family: var(--font-mono);">--</span></div>
+          <div><span style="color: var(--text-muted);">ML Risk Score:</span> <strong id="modalScore" style="font-family: var(--font-mono); color: var(--rose);">--</strong></div>
+        </div>
+
+        <!-- Explainable Diagnostics in Modal -->
+        <div style="margin-bottom: 1.5rem;">
+          <div style="font-size: 0.85rem; font-weight: 700; color: #FFFFFF; margin-bottom: 0.5rem;">Explainable AI Threat Diagnostics</div>
+          <div class="factors-list" id="modalFactorsList"></div>
+        </div>
+
+        <!-- Analyst Action Bar -->
+        <div style="background: rgba(15, 23, 42, 0.95); border: 1px solid var(--border-subtle); padding: 1rem; border-radius: var(--radius-sm); display: flex; justify-content: flex-end; gap: 0.75rem;">
+          <button class="btn btn-secondary btn-sm" id="btnModalApprove">
+            <span>✅</span> Approve & Whitelist
+          </button>
+          <button class="btn btn-danger btn-sm" id="btnModalConfirmFraud">
+            <span>🚫</span> Confirm Fraud & Lock Card
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+  </div>
+
+  <!-- Application Scripts -->
+  <script src="/static/js/charts.js"></script>
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
